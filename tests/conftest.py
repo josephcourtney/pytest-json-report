@@ -1,12 +1,15 @@
+import importlib.util
 import json
 
 import pytest
 
-pytest_plugins = 'pytester'
+has_xdist = importlib.util.find_spec("xdist") is not None
+
+pytest_plugins = "pytester"
 miss_map = {
-    'V': 'Different values',
-    'K': 'Different keys',
-    'T': 'Different types',
+    "V": "Different values",
+    "K": "Different keys",
+    "T": "Different types",
 }
 # Some test cases borrowed from github.com/mattcl/pytest-json
 FILE = """
@@ -100,8 +103,7 @@ def tests(json_data):
 
 
 def tests_only(json_data):
-    return {test['nodeid'].split('::')[-1][5:]: test for test in
-            json_data['tests']}
+    return {test["nodeid"].split("::")[-1][5:]: test for test in json_data["tests"]}
 
 
 # Each test run should work with and without xdist (-n specifies workers)
@@ -112,51 +114,23 @@ def num_processes(request):
 
 @pytest.fixture
 def make_json(num_processes, testdir):
-    def func(content=FILE, args=['-vv', '--json-report', '-n=%d' %
-             num_processes], path='.report.json'):
+    def func(content=FILE, args=None, path=".report.json"):
+        if args is None:
+            base_args = ["-vv", "-p", "pytest_json_report.plugin", "--json-report"]
+            # Only add the -n option if xdist is available and more than one process is requested.
+            if has_xdist and num_processes > 1:
+                base_args.append(f"-n={num_processes}")
+            args = base_args
         testdir.makepyfile(content)
-        testdir.runpytest(*args)
-        with open(str(testdir.tmpdir / path)) as f:
-            data = json.load(f)
-        return data
+        result = testdir.runpytest(*args)
+        # Check if the report file was generated.
+        report_path = testdir.tmpdir / path
+        if not report_path.exists():
+            pytest.fail(f"Report file {path} was not generated. Run result: {result.stdout.str()}")
+        with open(str(report_path), encoding="utf-8") as f:
+            return json.load(f)
+
     return func
-
-
-@pytest.fixture
-def match_reports():
-    def f(a, b):
-        diffs = list(diff(normalize_report(a), normalize_report(b)))
-        if not diffs:
-            return True
-        for kind, path, a_, b_ in diffs:
-            path_str = '.'.join(path)
-            kind_str = miss_map[kind]
-            if kind == 'V':
-                print(kind_str, path_str)
-                print('\t', a_)
-                print('\t', b_)
-            else:
-                print(kind_str + ':', path_str, a_, b_)
-        return False
-    return f
-
-
-def normalize_report(report):
-    report['created'] = 0
-    report['duration'] = 0
-    # xdist doesn't report successful node collections
-    report['collectors'] = []
-
-    for test in report['tests']:
-        for stage_name in ('setup', 'call', 'teardown'):
-            try:
-                stage = test[stage_name]
-            except KeyError:
-                continue
-            stage['duration'] = 0
-            if 'longrepr' not in stage:
-                stage['longrepr'] = ''
-    return report
 
 
 def diff(a, b, path=None):
@@ -165,26 +139,26 @@ def diff(a, b, path=None):
         path = []
     # We can't compare "longrepr" because they may be different between runs
     # with and without workers
-    if path and path[-1] != 'longrepr':
+    if path and path[-1] != "longrepr":
         return
     if type(a) != type(b):
-        yield ('T', path, a, b)
+        yield ("T", path, a, b)
         return
     if type(a) == dict:
         a_keys = sorted(a.keys())
         b_keys = sorted(b.keys())
         if a_keys != b_keys:
-            yield ('K', path, a_keys, b_keys)
+            yield ("K", path, a_keys, b_keys)
             return
-        for ak, bk in zip(a_keys, b_keys):
-            for item in diff(a[ak], b[bk], path + [str(ak)]):
+        for ak, bk in zip(a_keys, b_keys, strict=False):
+            for item in diff(a[ak], b[bk], [*path, str(ak)]):
                 yield item
         return
     if type(a) == list:
-        for i, (ai, bi) in enumerate(zip(a, b)):
-            for item in diff(ai, bi, path + [str(i)]):
+        for i, (ai, bi) in enumerate(zip(a, b, strict=False)):
+            for item in diff(ai, bi, [*path, str(i)]):
                 yield item
         return
     if a != b:
-        yield ('V', path, repr(a), repr(b))
+        yield ("V", path, repr(a), repr(b))
     return

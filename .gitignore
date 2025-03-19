@@ -3,6 +3,7 @@ __pycache__/
 *$py.class
 *.egg-info/
 .coverage
+cov.xml
 .cache/
 .report.json
 TODO
@@ -11,3 +12,5 @@ build/
 dist/
 .pytest_cache/
 .coverage.*
+.aider*
+ruff.default.toml

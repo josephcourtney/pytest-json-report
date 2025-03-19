@@ -1,0 +1,105 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+description = 'A pytest plugin to report test results as JSON files'
+name = "pytest-json-report"
+dynamic = ["version"]
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT License" }
+authors = [
+  { name = "Joseph M. Courtney", email = "joseph.m.courtney@gmail.com" },
+  { name = 'numirias', email = 'numirias@users.noreply.github.com' },
+]
+urls = { "Homepage" = "https://github.com/josephcourtney/pytest-json-report", "Bug Tracker" = "https://github.com/josephcourtney/pytest-json-report/issues" }
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  'Framework :: Pytest',
+]
+dependencies = ["pytest>=8.3.5", "pytest-metadata>=3.1.1"]
+
+
+[dependency-groups]
+dev = [
+  "basedpyright>=1.28.1",
+  "coverage>=7.6.12",
+  "pytest-cov>=6.0.0",
+  "pytest-xdist>=3.6.1",
+  "ruff>=0.10.0",
+]
+
+[tool.hatch.build]
+includes = ["src/pytest_json_report/**"]
+
+[tool.hatch.version]
+path = "src/pytest_json_report/__version__.py"
+
+[tool.ruff]
+extend = "./ruff.default.toml"
+
+[tool.ruff.lint]
+ignore = []
+
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+exclude = "^tests/"
+plugins = []
+
+[tool.pytest.ini_options]
+addopts = [
+  "--cov=pytest_json_report",
+  "--cov-report=xml",
+  "--cov-report=term-missing",
+]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+# Regexes for lines to exclude from consideration
+exclude_also = [
+  # Don't complain about missing debug-only code:
+  "def __repr__",
+  "if self\\.debug",
+
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+
+  # Don't complain if non-runnable code isn't run:
+  "if 0:",
+  "if __name__ == .__main__.:",
+
+  # Don't complain about abstract methods, they aren't run:
+  "@(abc\\.)?abstractmethod",
+]
+ignore_errors = true
+
+[tool.coverage.xml]
+output = "cov.xml"
+
+
+[tool.basedpyright]
+typeCheckingMode = "recommended"
+pythonVersion = "3.12"
+pythonPlatform = "Darwin"
+reportImplicitOverride = false
+reportMissingTypeStubs = false
+reportUnusedParameter = false
+executionEnvironments = [
+  { root = "tests", reportPrivateUsage = false, reportUnusedCallResult = false, extraPaths = [
+  ] },
+]
