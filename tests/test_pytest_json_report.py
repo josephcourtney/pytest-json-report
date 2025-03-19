@@ -2,10 +2,9 @@ import logging
 from pathlib import Path
 
 import pytest
+from rich.console import Console
 
 from pytest_json_report.plugin import JSONReport
-
-from rich.console import Console
 
 from .conftest import FILE, tests_only
 
@@ -346,7 +345,14 @@ def test_metadata_fixture_without_report_flag(testdir):
 
 
 def test_environment_via_metadata_plugin(make_json):
-    data = make_json("", ["--json-report", "--metadata", "x", "y"])
+    # dummy test so that there is something to collect, and metadata will be populated
+    data = make_json(
+        """
+        def test_dummy():
+            pass
+    """,
+        ["--json-report", "--metadata", "x", "y", "--verbose"],
+    )
     assert "Python" in data["environment"]
     assert data["environment"]["x"] == "y"
 
@@ -563,7 +569,6 @@ def test_bug_31(make_json):
             FLAKY_RUNS += 1
             assert FLAKY_RUNS == 2
     """)
-    console.print(data)
     assert set(data["summary"].items()) == {
         ("total", 2),
         ("passed", 2),

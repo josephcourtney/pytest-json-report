@@ -124,6 +124,8 @@ def make_json(num_processes, testdir):
         testdir.makepyfile(content)
         testdir.runpytest(*args)
         with (Path(testdir.tmpdir) / path).open(encoding="utf-8") as f:
+            print(f.read())
+        with (Path(testdir.tmpdir) / path).open(encoding="utf-8") as f:
             return json.load(f)
 
     return func

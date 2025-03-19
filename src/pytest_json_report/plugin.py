@@ -219,12 +219,18 @@ class JSONReport(JSONReportBase):
         if self._num_deselected:
             summary_data["deselected"] = self._num_deselected
 
+        metadata = {}
+        if self._config.pluginmanager.getplugin("metadata"):
+            from pytest_metadata.plugin import metadata_key
+
+            metadata = self._config.stash[metadata_key]
+
         json_report = serialize.make_report(
             created=time.time(),
             duration=time.time() - self._start_time,
             exitcode=session.exitstatus,
             root=str(session.fspath),
-            environment=getattr(self._config, "_metadata", {}),
+            environment=metadata,
             summary=serialize.make_summary(self._json_tests, **summary_data),
         )
         if not self._config.option.json_report_summary:

@@ -21,25 +21,21 @@ classifiers = [
   "Operating System :: OS Independent",
   'Framework :: Pytest',
 ]
-dependencies = [
-  "execnet==2.1.1",
-  "iniconfig==2.0.0",
-  "packaging==24.2",
-  "pluggy==1.5.0",
-  "pytest==8.3.5",
-  "pytest-metadata==3.1.1",
-  "pytest-xdist==3.6.1",
-]
+dependencies = ["pytest>=8.3.5", "pytest-metadata>=3.1.1"]
 
 
 [dependency-groups]
 dev = [
-  "basedpyright>=1.28.2",
-  "coverage>=7.7.0",
-  "flaky>=3.8.1",
-  "pytest-cov>=6.0.0",
-  "rich>=13.9.4",
   "ruff>=0.11.0",
+
+  "basedpyright>=1.28.2",
+
+  "pytest-cov>=6.0.0",
+  "coverage>=7.7.0",
+  "pytest-xdist>=3.6.1",
+  "flaky>=3.8.1",
+
+  "rich>=13.9.4",
 ]
 
 [project.entry-points.pytest11]

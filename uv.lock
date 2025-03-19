@@ -185,13 +185,8 @@ wheels = [
 name = "pytest-json-report"
 source = { editable = "." }
 dependencies = [
-    { name = "execnet" },
-    { name = "iniconfig" },
-    { name = "packaging" },
-    { name = "pluggy" },
     { name = "pytest" },
     { name = "pytest-metadata" },
-    { name = "pytest-xdist" },
 ]
 
 [package.dev-dependencies]
@@ -200,19 +195,15 @@ dev = [
     { name = "coverage" },
     { name = "flaky" },
     { name = "pytest-cov" },
+    { name = "pytest-xdist" },
     { name = "rich" },
     { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "execnet", specifier = "==2.1.1" },
-    { name = "iniconfig", specifier = "==2.0.0" },
-    { name = "packaging", specifier = "==24.2" },
-    { name = "pluggy", specifier = "==1.5.0" },
-    { name = "pytest", specifier = "==8.3.5" },
-    { name = "pytest-metadata", specifier = "==3.1.1" },
-    { name = "pytest-xdist", specifier = "==3.6.1" },
+    { name = "pytest", specifier = ">=8.3.5" },
+    { name = "pytest-metadata", specifier = ">=3.1.1" },
 ]
 
 [package.metadata.requires-dev]
@@ -221,6 +212,7 @@ dev = [
     { name = "coverage", specifier = ">=7.7.0" },
     { name = "flaky", specifier = ">=3.8.1" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
+    { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "rich", specifier = ">=13.9.4" },
     { name = "ruff", specifier = ">=0.11.0" },
 ]
