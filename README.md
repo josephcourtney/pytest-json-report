@@ -10,38 +10,38 @@ It can report a summary, test details, captured output, logs, exception tracebac
 
 ## Table of contents
 
-* [Installation](#installation)
-* [Options](#options)
-* [Usage](#usage)
-   * [Metadata](#metadata)
-   * [Modifying the report](#modifying-the-report)
-   * [Direct invocation](#direct-invocation)
-* [Format](#format)
-   * [Summary](#summary)
-   * [Environment](#environment)
-   * [Collectors](#collectors)
-   * [Tests](#tests)
-   * [Test stage](#test-stage)
-   * [Log](#log)
-   * [Warnings](#warnings)
-* [Related tools](#related-tools)
+- [Installation](#installation)
+- [Options](#options)
+- [Usage](#usage)
+  - [Metadata](#metadata)
+  - [Modifying the report](#modifying-the-report)
+  - [Direct invocation](#direct-invocation)
+- [Format](#format)
+  - [Summary](#summary)
+  - [Environment](#environment)
+  - [Collectors](#collectors)
+  - [Tests](#tests)
+  - [Test stage](#test-stage)
+  - [Log](#log)
+  - [Warnings](#warnings)
+- [Related tools](#related-tools)
 
 ## Installation
 
 ```
-pip install pytest-json-report --upgrade 
+pip install pytest-json-report --upgrade
 ```
 
 ## Options
 
-| Option | Description |
-| --- | --- |
-| `--json-report` | Create JSON report |
-| `--json-report-file=PATH` | Target path to save JSON report (use "none" to not save the report) |
-| `--json-report-summary` | Just create a summary without per-test details |
+| Option                          | Description                                                                                                             |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `--json-report`                 | Create JSON report                                                                                                      |
+| `--json-report-file=PATH`       | Target path to save JSON report (use "none" to not save the report)                                                     |
+| `--json-report-summary`         | Just create a summary without per-test details                                                                          |
 | `--json-report-omit=FIELD_LIST` | List of fields to omit in the report (choose from: `collectors`, `log`, `traceback`, `streams`, `warnings`, `keywords`) |
-| `--json-report-indent=LEVEL` | Pretty-print JSON with specified indentation level |
-| `--json-report-verbosity=LEVEL` | Set verbosity (default is value of `--verbosity`) |
+| `--json-report-indent=LEVEL`    | Pretty-print JSON with specified indentation level                                                                      |
+| `--json-report-verbosity=LEVEL` | Set verbosity (default is value of `--verbosity`)                                                                       |
 
 ## Usage
 
@@ -97,9 +97,11 @@ Also, you could add metadata using [pytest-metadata's `--metadata` switch](https
 ### A note on hooks
 
 If you're using a `pytest_json_*` hook although the plugin is not installed or not active (not using `--json-report`), pytest doesn't recognize it and may fail with an internal error like this:
+
 ```
 INTERNALERROR> pluggy.manager.PluginValidationError: unknown hook 'pytest_json_runtest_metadata' in plugin <module 'conftest' from 'conftest.py'>
 ```
+
 You can avoid this by declaring the hook implementation optional:
 
 ```python
@@ -131,7 +133,7 @@ def pytest_sessionfinish(session):
     print('exited with', report['exitcode'])
 ```
 
-If you *really* want to change how the result of a test stage run is turned into JSON, you can use the `pytest_json_runtest_stage` hook. It takes a [`TestReport`](https://docs.pytest.org/en/latest/reference.html#_pytest.runner.TestReport) and returns a JSON-serializable dict:
+If you _really_ want to change how the result of a test stage run is turned into JSON, you can use the `pytest_json_runtest_stage` hook. It takes a [`TestReport`](https://docs.pytest.org/en/latest/reference.html#_pytest.runner.TestReport) and returns a JSON-serializable dict:
 
 ```python
 def pytest_json_runtest_stage(report):
@@ -144,7 +146,7 @@ You can use the plugin when invoking `pytest.main()` directly from code:
 
 ```python
 import pytest
-from pytest_jsonreport.plugin import JSONReport
+from pytest_json_report.plugin import JSONReport
 
 plugin = JSONReport()
 pytest.main(['--json-report-file=none', 'test_foo.py'], plugins=[plugin])
@@ -162,22 +164,21 @@ And save the report manually:
 plugin.save_report('/tmp/my_report.json')
 ```
 
-
 ## Format
 
 The JSON report contains metadata of the session, a summary, collectors, tests and warnings. You can find a sample report in [`sample_report.json`](sample_report.json).
 
-| Key | Description |
-| --- | --- |
-| `created` | Report creation date. (Unix time) |
-| `duration` | Session duration in seconds. |
-| `exitcode` | Process exit code as listed [in the pytest docs](https://docs.pytest.org/en/latest/usage.html#possible-exit-codes). The exit code is a quick way to tell if any tests failed, an internal error occurred, etc. |
-| `root` | Absolute root path from which the session was started. |
-| `environment` | [Environment](#environment) entry. |
-| `summary` | [Summary](#summary) entry. |
-| `collectors` | [Collectors](#collectors) entry. (absent if `--json-report-summary` or if no collectors)  |
-| `tests` | [Tests](#tests) entry. (absent if `--json-report-summary`)  |
-| `warnings` | [Warnings](#warnings) entry. (absent if `--json-report-summary` or if no warnings)  |
+| Key           | Description                                                                                                                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `created`     | Report creation date. (Unix time)                                                                                                                                                                              |
+| `duration`    | Session duration in seconds.                                                                                                                                                                                   |
+| `exitcode`    | Process exit code as listed [in the pytest docs](https://docs.pytest.org/en/latest/usage.html#possible-exit-codes). The exit code is a quick way to tell if any tests failed, an internal error occurred, etc. |
+| `root`        | Absolute root path from which the session was started.                                                                                                                                                         |
+| `environment` | [Environment](#environment) entry.                                                                                                                                                                             |
+| `summary`     | [Summary](#summary) entry.                                                                                                                                                                                     |
+| `collectors`  | [Collectors](#collectors) entry. (absent if `--json-report-summary` or if no collectors)                                                                                                                       |
+| `tests`       | [Tests](#tests) entry. (absent if `--json-report-summary`)                                                                                                                                                     |
+| `warnings`    | [Warnings](#warnings) entry. (absent if `--json-report-summary` or if no warnings)                                                                                                                             |
 
 #### Example
 
@@ -199,12 +200,12 @@ The JSON report contains metadata of the session, a summary, collectors, tests a
 
 Number of outcomes per category and the total number of test items.
 
-| Key | Description |
-| --- | --- |
-|  `collected` | Total number of tests collected. |
-|  `total` | Total number of tests run. |
-|  `deselected` | Total number of tests deselected. (absent if number is 0) |
-| `<outcome>` | Number of tests with that outcome. (absent if number is 0) |
+| Key          | Description                                                |
+| ------------ | ---------------------------------------------------------- |
+| `collected`  | Total number of tests collected.                           |
+| `total`      | Total number of tests run.                                 |
+| `deselected` | Total number of tests deselected. (absent if number is 0)  |
+| `<outcome>`  | Number of tests with that outcome. (absent if number is 0) |
 
 #### Example
 
@@ -251,20 +252,20 @@ The environment section is provided by [pytest-metadata](https://github.com/pyte
 
 A list of collector nodes. These are useful to check what tests are available without running them, or to debug an error during test discovery.
 
-| Key | Description |
-| --- | --- |
-| `nodeid` | ID of the collector node. ([See docs](https://docs.pytest.org/en/latest/example/markers.html#node-id)) The root node has an empty node ID. |
-| `outcome` | Outcome of the collection. (Not the test outcome!) |
-| `result` | Nodes collected by the collector. |
-| `longrepr` | Representation of the collection error. (absent if no error occurred) |
+| Key        | Description                                                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `nodeid`   | ID of the collector node. ([See docs](https://docs.pytest.org/en/latest/example/markers.html#node-id)) The root node has an empty node ID. |
+| `outcome`  | Outcome of the collection. (Not the test outcome!)                                                                                         |
+| `result`   | Nodes collected by the collector.                                                                                                          |
+| `longrepr` | Representation of the collection error. (absent if no error occurred)                                                                      |
 
 The `result` is a list of the collected nodes:
 
-| Key | Description |
-| --- | --- |
-| `nodeid` | ID of the node. |
-| `type` | Type of the collected node. |
-| `lineno` | Line number. (absent if not applicable) |
+| Key          | Description                                                  |
+| ------------ | ------------------------------------------------------------ |
+| `nodeid`     | ID of the node.                                              |
+| `type`       | Type of the collected node.                                  |
+| `lineno`     | Line number. (absent if not applicable)                      |
 | `deselected` | `true` if the test is deselected. (absent if not deselected) |
 
 #### Example
@@ -308,14 +309,14 @@ The `result` is a list of the collected nodes:
 
 A list of test nodes. Each completed test stage produces a stage object (`setup`, `call`, `teardown`) with its own `outcome`.
 
-| Key | Description |
-| --- | --- |
-| `nodeid` | ID of the test node. |
-| `lineno` | Line number where the test starts. |
-| `keywords` | List of keywords and markers associated with the test. |
-| `outcome` | Outcome of the test run. |
+| Key                       | Description                                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `nodeid`                  | ID of the test node.                                                                                                           |
+| `lineno`                  | Line number where the test starts.                                                                                             |
+| `keywords`                | List of keywords and markers associated with the test.                                                                         |
+| `outcome`                 | Outcome of the test run.                                                                                                       |
 | `{setup, call, teardown}` | [Test stage](#test-stage) entry. To find the error in a failed test you need to check all stages. (absent if stage didn't run) |
-| `metadata` | [Metadata](#metadata) item. (absent if no metadata) |
+| `metadata`                | [Metadata](#metadata) item. (absent if no metadata)                                                                            |
 
 #### Example
 
@@ -341,21 +342,20 @@ A list of test nodes. Each completed test stage produces a stage object (`setup`
 ]
 ```
 
-
 ### Test stage
 
 A test stage item.
 
-| Key | Description |
-| --- | --- |
-| `duration` | Duration of the test stage in seconds. |
-| `outcome` | Outcome of the test stage. (can be different from the overall test outcome) |
-| `crash` | Crash entry. (absent if no error occurred) |
-| `traceback` | List of traceback entries. (absent if no error occurred; affected by `--tb` option) |
-| `stdout` | Standard output. (absent if none available) |
-| `stderr` | Standard error. (absent if none available) |
-| `log` | [Log](#log) entry. (absent if none available) |
-| `longrepr` | Representation of the error. (absent if no error occurred; format affected by `--tb` option) |
+| Key         | Description                                                                                  |
+| ----------- | -------------------------------------------------------------------------------------------- |
+| `duration`  | Duration of the test stage in seconds.                                                       |
+| `outcome`   | Outcome of the test stage. (can be different from the overall test outcome)                  |
+| `crash`     | Crash entry. (absent if no error occurred)                                                   |
+| `traceback` | List of traceback entries. (absent if no error occurred; affected by `--tb` option)          |
+| `stdout`    | Standard output. (absent if none available)                                                  |
+| `stderr`    | Standard error. (absent if none available)                                                   |
+| `log`       | [Log](#log) entry. (absent if none available)                                                |
+| `longrepr`  | Representation of the error. (absent if no error occurred; format affected by `--tb` option) |
 
 #### Example
 
@@ -401,7 +401,7 @@ A test stage item.
 
 A list of log records. The fields of a log record are the [`logging.LogRecord` attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes), with the exception that the fields `exc_info` and `args` are always empty and `msg` contains the formatted log message.
 
-You can apply [`logging.makeLogRecord()`](https://docs.python.org/3/library/logging.html#logging.makeLogRecord)  on a log record to convert it back to a `logging.LogRecord` object.
+You can apply [`logging.makeLogRecord()`](https://docs.python.org/3/library/logging.html#logging.makeLogRecord) on a log record to convert it back to a `logging.LogRecord` object.
 
 #### Example
 
@@ -433,17 +433,16 @@ You can apply [`logging.makeLogRecord()`](https://docs.python.org/3/library/logg
 ]
 ```
 
-
 ### Warnings
 
 A list of warnings that occurred during the session. (See the [pytest docs on warnings](https://docs.pytest.org/en/latest/warnings.html).)
 
-| Key | Description |
-| --- | --- |
-| `filename` | File name. |
-| `lineno` | Line number. |
-| `message` | Warning message. |
-| `when` | When the warning was captured. (`"config"`, `"collect"` or `"runtest"` as listed [here](https://docs.pytest.org/en/latest/reference.html#_pytest.hookspec.pytest_warning_captured)) |
+| Key        | Description                                                                                                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `filename` | File name.                                                                                                                                                                          |
+| `lineno`   | Line number.                                                                                                                                                                        |
+| `message`  | Warning message.                                                                                                                                                                    |
+| `when`     | When the warning was captured. (`"config"`, `"collect"` or `"runtest"` as listed [here](https://docs.pytest.org/en/latest/reference.html#_pytest.hookspec.pytest_warning_captured)) |
 
 #### Example
 

@@ -1,0 +1,1 @@
+- Relay warnings correctly when using xdist
