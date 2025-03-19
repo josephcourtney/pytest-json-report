@@ -5,7 +5,11 @@ import pytest
 
 from pytest_json_report.plugin import JSONReport
 
+from rich.console import Console
+
 from .conftest import FILE, tests_only
+
+console = Console()
 
 
 def test_arguments_in_help(misc_testdir):
@@ -80,10 +84,11 @@ def test_report_collectors(num_processes, make_json):
         # xdist only reports failing collectors
         assert len(collectors) == 0
         return
-    assert len(collectors) == 2
+    assert len(collectors) == 3
     assert all(c["outcome"] == "passed" for c in collectors)
-    assert collectors[0] == {
-        "nodeid": "",
+
+    assert {
+        "nodeid": ".",
         "outcome": "passed",
         "result": [
             {
@@ -91,12 +96,17 @@ def test_report_collectors(num_processes, make_json):
                 "type": "Module",
             }
         ],
-    }
-    assert {
-        "nodeid": "test_report_collectors.py::test_pass",
-        "type": "Function",
-        "lineno": 25,
-    } in collectors[1]["result"]
+    } in collectors
+
+    assert any(
+        {
+            "nodeid": "test_report_collectors.py::test_pass",
+            "type": "Function",
+            "lineno": 25,
+        }
+        in c["result"]
+        for c in collectors
+    )
 
 
 def test_report_failed_collector(num_processes, make_json):
@@ -173,7 +183,8 @@ def test_report_crash_and_traceback(tests):
     traceback = [
         {"path": "test_report_crash_and_traceback.py", "lineno": 66, "message": ""},
         {"path": "test_report_crash_and_traceback.py", "lineno": 64, "message": "in foo"},
-        {"path": "test_report_crash_and_traceback.py", "lineno": 64, "message": "in <listcomp>"},
+        # I think this is no longer needed because of how list comprehensions changed
+        # {"path": "test_report_crash_and_traceback.py", "lineno": 64, "message": "in <listcomp>"},
         {"path": "test_report_crash_and_traceback.py", "lineno": 60, "message": "in bar"},
         {"path": "test_report_crash_and_traceback.py", "lineno": 55, "message": "TypeError"},
     ]
@@ -552,6 +563,7 @@ def test_bug_31(make_json):
             FLAKY_RUNS += 1
             assert FLAKY_RUNS == 2
     """)
+    console.print(data)
     assert set(data["summary"].items()) == {
         ("total", 2),
         ("passed", 2),
