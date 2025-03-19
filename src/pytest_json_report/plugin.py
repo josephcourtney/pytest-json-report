@@ -5,6 +5,7 @@ import time
 import warnings
 from collections import OrderedDict
 from contextlib import contextmanager, suppress
+from pathlib import Path
 
 import _pytest.hookspec
 import pytest
@@ -25,6 +26,7 @@ class JSONReportBase:
         if self._config.option.tbstyle == "no" and not self._must_omit("traceback"):
             self._config.option.json_report_omit.append("traceback")
 
+    @pytest.hookimpl
     def pytest_addhooks(self, pluginmanager):
         pluginmanager.add_hookspecs(Hooks)
 
@@ -102,7 +104,7 @@ class JSONReportBase:
 
 class JSONReport(JSONReportBase):
     def __init__(self, *args, **kwargs):
-        JSONReportBase.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._start_time = None
         self._json_tests = OrderedDict()
         self._json_collectors = []
@@ -225,10 +227,10 @@ class JSONReport(JSONReportBase):
         if self.report is None:
             msg = "could not save report: no report available"
             raise Exception(msg)
-        dirname = os.path.dirname(path)
+        dirname = Path(path).parent
         if dirname:
             try:
-                os.makedirs(dirname)
+                dirname.mkdir(parents=True, exist_ok=True)
             except OSError as e:
                 import errno
 
@@ -330,7 +332,7 @@ def pytest_addoption(parser):
     group.addoption(
         "--json-report-indent", type=int, help="pretty-print JSON with specified indentation level"
     )
-    group._addoption(
+    group.addoption(
         "--json-report-verbosity", type=int, help="set verbosity (default is value of --verbosity)"
     )
 
