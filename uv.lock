@@ -169,19 +169,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pytest-cov"
-version = "6.0.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "coverage" },
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/be/45/9b538de8cef30e17c7b45ef42f538a94889ed6a16f2387a6c89e73220651/pytest-cov-6.0.0.tar.gz", hash = "sha256:fde0b595ca248bb8e2d76f020b465f3b107c9632e6a1d1705f17834c89dcadc0", size = 66945 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/36/3b/48e79f2cd6a61dbbd4807b4ed46cb564b4fd50a76166b1c4ea5c1d9e2371/pytest_cov-6.0.0-py3-none-any.whl", hash = "sha256:eee6f1b9e61008bd34975a4d5bab25801eb31898b032dd55addc93e96fcaaa35", size = 22949 },
-]
-
-[[package]]
 name = "pytest-json-report"
 source = { editable = "." }
 dependencies = [
@@ -194,7 +181,6 @@ dev = [
     { name = "basedpyright" },
     { name = "coverage" },
     { name = "flaky" },
-    { name = "pytest-cov" },
     { name = "pytest-xdist" },
     { name = "rich" },
     { name = "ruff" },
@@ -211,7 +197,6 @@ dev = [
     { name = "basedpyright", specifier = ">=1.28.2" },
     { name = "coverage", specifier = ">=7.7.0" },
     { name = "flaky", specifier = ">=3.8.1" },
-    { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "rich", specifier = ">=13.9.4" },
     { name = "ruff", specifier = ">=0.11.0" },

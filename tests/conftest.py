@@ -1,8 +1,11 @@
 import json
 from pathlib import Path
 
+import coverage
+
 import pytest
 
+coverage.process_startup()
 pytest_plugins = [
     "pytester",
 ]
@@ -100,11 +103,11 @@ def json_data(make_json):
 
 
 @pytest.fixture
-def tests(json_data):
-    return tests_only(json_data)
+def extracted_tests(json_data):
+    return extract_tests(json_data)
 
 
-def tests_only(json_data):
+def extract_tests(json_data):
     return {test["nodeid"].split("::")[-1][5:]: test for test in json_data["tests"]}
 
 

@@ -6,7 +6,7 @@ from rich.console import Console
 
 from pytest_json_report.plugin import JSONReport
 
-from .conftest import FILE, tests_only
+from .conftest import FILE, extract_tests
 
 console = Console()
 
@@ -141,19 +141,27 @@ def test_report_failed_collector2(num_processes, make_json):
     assert collectors[idx]["longrepr"].startswith("ImportError")
 
 
-def test_report_item_keys(tests):
-    assert set(tests["pass"]) == {"nodeid", "lineno", "outcome", "keywords", "setup", "call", "teardown"}
+def test_report_item_keys(extracted_tests):
+    assert set(extracted_tests["pass"]) == {
+        "nodeid",
+        "lineno",
+        "outcome",
+        "keywords",
+        "setup",
+        "call",
+        "teardown",
+    }
 
 
-def test_report_outcomes(tests):
-    assert len(tests) == 10
-    assert tests["pass"]["outcome"] == "passed"
-    assert tests["fail_with_fixture"]["outcome"] == "failed"
-    assert tests["xfail"]["outcome"] == "xfailed"
-    assert tests["xfail_but_passing"]["outcome"] == "xpassed"
-    assert tests["fail_during_setup"]["outcome"] == "error"
-    assert tests["fail_during_teardown"]["outcome"] == "error"
-    assert tests["skip"]["outcome"] == "skipped"
+def test_report_outcomes(extracted_tests):
+    assert len(extracted_tests) == 10
+    assert extracted_tests["pass"]["outcome"] == "passed"
+    assert extracted_tests["fail_with_fixture"]["outcome"] == "failed"
+    assert extracted_tests["xfail"]["outcome"] == "xfailed"
+    assert extracted_tests["xfail_but_passing"]["outcome"] == "xpassed"
+    assert extracted_tests["fail_during_setup"]["outcome"] == "error"
+    assert extracted_tests["fail_during_teardown"]["outcome"] == "error"
+    assert extracted_tests["skip"]["outcome"] == "skipped"
 
 
 def test_report_summary(make_json):
@@ -169,13 +177,13 @@ def test_report_summary(make_json):
     }
 
 
-def test_report_longrepr(tests):
-    assert "assert False" in tests["fail_with_fixture"]["call"]["longrepr"]
+def test_report_longrepr(extracted_tests):
+    assert "assert False" in extracted_tests["fail_with_fixture"]["call"]["longrepr"]
 
 
-def test_report_crash_and_traceback(tests):
-    assert "traceback" not in tests["pass"]["call"]
-    call = tests["fail_nested"]["call"]
+def test_report_crash_and_traceback(extracted_tests):
+    assert "traceback" not in extracted_tests["pass"]["call"]
+    call = extracted_tests["fail_nested"]["call"]
     assert call["crash"]["path"].endswith("test_report_crash_and_traceback.py")
     assert call["crash"]["lineno"] == 55
     assert call["crash"]["message"].startswith("TypeError: unsupported ")
@@ -229,19 +237,19 @@ def test_report_item_deselected(make_json):
 
 def test_no_traceback(make_json):
     data = make_json(FILE, ["--json-report", "--json-report-omit=traceback"])
-    tests_ = tests_only(data)
+    tests_ = extract_tests(data)
     assert "traceback" not in tests_["fail_nested"]["call"]
 
 
 def test_pytest_no_traceback(make_json):
     data = make_json(FILE, ["--json-report", "--tb=no"])
-    tests_ = tests_only(data)
+    tests_ = extract_tests(data)
     assert "traceback" not in tests_["fail_nested"]["call"]
 
 
 def test_no_streams(make_json):
     data = make_json(FILE, ["--json-report", "--json-report-omit=streams"])
-    call = tests_only(data)["fail_with_fixture"]["call"]
+    call = extract_tests(data)["fail_with_fixture"]["call"]
     assert "stdout" not in call
     assert "stderr" not in call
 
@@ -254,16 +262,16 @@ def test_summary_only(make_json):
     assert "warnings" not in data
 
 
-def test_report_streams(tests):
-    test = tests["fail_with_fixture"]
+def test_report_streams(extracted_tests):
+    test = extracted_tests["fail_with_fixture"]
     assert test["setup"]["stdout"] == "setup\n"
     assert test["setup"]["stderr"] == "setuperr\n"
     assert test["call"]["stdout"] == "call\n"
     assert test["call"]["stderr"] == "callerr\n"
     assert test["teardown"]["stdout"] == "teardown\n"
     assert test["teardown"]["stderr"] == "teardownerr\n"
-    assert "stdout" not in tests["pass"]["call"]
-    assert "stderr" not in tests["pass"]["call"]
+    assert "stdout" not in extracted_tests["pass"]["call"]
+    assert "stderr" not in extracted_tests["pass"]["call"]
 
 
 def test_record_property(make_json, num_processes):
@@ -280,7 +288,7 @@ def test_record_property(make_json, num_processes):
         def test_record_property_unserializable(record_property):
             record_property('foo', b'somebytes')
     """)
-    tests_ = tests_only(data)
+    tests_ = extract_tests(data)
     assert tests_["record_property"]["user_properties"] == [
         {"foo": 42},
         {"bar": ["baz", {"x": "y"}]},
@@ -322,7 +330,7 @@ def test_json_metadata(make_json):
         def test_multi_stage_metadata(json_metadata, stage):
             json_metadata['b'] = 2
     """)
-    tests_ = tests_only(data)
+    tests_ = extract_tests(data)
     assert tests_["metadata1"]["metadata"] == {"x": "foo", "y": [1, {"a": 2}]}
     assert tests_["metadata2"]["metadata"] == {"z": 1}
     assert "metadata" not in tests_["unused_metadata"]
