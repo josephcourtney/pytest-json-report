@@ -1,5 +1,4 @@
-import os.path
-
+import os
 import pytest
 
 from pytest_json_report.plugin import JSONReport
