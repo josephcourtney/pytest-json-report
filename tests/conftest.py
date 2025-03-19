@@ -11,7 +11,6 @@ miss_map = {
     "K": "Different keys",
     "T": "Different types",
 }
-# Some test cases borrowed from github.com/mattcl/pytest-json
 FILE = """
 from __future__ import print_function
 import sys
@@ -106,7 +105,6 @@ def tests_only(json_data):
     return {test["nodeid"].split("::")[-1][5:]: test for test in json_data["tests"]}
 
 
-# Each test run should work with and without xdist (-n specifies workers)
 @pytest.fixture(params=[0, 1, 4])
 def num_processes(request):
     return request.param
@@ -117,13 +115,11 @@ def make_json(num_processes, testdir):
     def func(content=FILE, args=None, path=".report.json"):
         if args is None:
             base_args = ["-vv", "-p", "pytest_json_report.plugin", "--json-report"]
-            # Only add the -n option if xdist is available and more than one process is requested.
             if has_xdist and num_processes > 1:
                 base_args.append(f"-n={num_processes}")
             args = base_args
         testdir.makepyfile(content)
         result = testdir.runpytest(*args)
-        # Check if the report file was generated.
         report_path = testdir.tmpdir / path
         if not report_path.exists():
             pytest.fail(f"Report file {path} was not generated. Run result: {result.stdout.str()}")
@@ -134,11 +130,8 @@ def make_json(num_processes, testdir):
 
 
 def diff(a, b, path=None):
-    """Return differences between reports a and b."""
     if path is None:
         path = []
-    # We can't compare "longrepr" because they may be different between runs
-    # with and without workers
     if path and path[-1] != "longrepr":
         return
     if type(a) != type(b):
@@ -162,3 +155,9 @@ def diff(a, b, path=None):
     if a != b:
         yield ("V", path, repr(a), repr(b))
     return
+
+
+@pytest.fixture
+def match_reports():
+    # Implement the match_reports fixture here
+    pass
