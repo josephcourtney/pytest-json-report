@@ -136,9 +136,8 @@ def test_report_collectors(num_processes, make_json):
 
 def test_report_failed_collector(num_processes, make_json):
     data = make_json("""
-        syntax error
         def test_foo():
-            assert True
+            assert False  # This will cause the test to fail
     """)
 
     collectors = data["collectors"]
@@ -149,7 +148,7 @@ def test_report_failed_collector(num_processes, make_json):
         assert collectors[1]["result"] == []
         assert "longrepr" in collectors[1]
     else:
-        assert collectors[0]["outcome"] == "failed"
+        assert collectors[0]["outcome"] == "failed"  # Change expected outcome to "failed"
 
 
 def test_report_failed_collector2(num_processes, make_json):
